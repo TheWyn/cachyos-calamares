@@ -156,6 +156,7 @@ def find_initcpio_features(partitions, root_mount_point):
     ]
 
     systemd_hook_allowed = libcalamares.job.configuration.get("useSystemdHook", False)
+    is_zfs_native_encrypted = libcalamares.globalstorage.value("zfsEncrypted")
 
     use_systemd = systemd_hook_allowed and target_env_call(["sh", "-c", "which systemd-cat"]) == 0
 
@@ -239,6 +240,11 @@ def find_initcpio_features(partitions, root_mount_point):
         modules.append("crc32c-intel" if cpuinfo().is_intel else "crc32c")
     else:
         hooks.append("fsck")
+
+    # remove plymouth hook for zfs with encryption
+    if uses_zfs and (is_zfs_native_encrypted or encrypt_hook):
+        libcalamares.utils.debug("Removing plymouth hook from initramfs")
+        hooks.remove("plymouth")
 
     return hooks, modules, files, binaries
 
