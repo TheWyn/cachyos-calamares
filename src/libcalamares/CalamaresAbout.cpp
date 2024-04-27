@@ -60,9 +60,10 @@ aboutMaintainers()
     return std::accumulate( std::cbegin( maintainers ),
                             std::cend( maintainers ),
                             QString(),
-                            []( QString s, const Maintainer& m )
+                            []( QString& s, const Maintainer& m )
                             {
-                                return std::move( s ) + m.text();
+                                s += m.text();
+                                return s;
                             } );
 }
 
